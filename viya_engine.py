@@ -81,16 +81,21 @@ JOB_TEXT = "/* CAS DATA step */" + STEP1 + "\n/* FedSQL */\n" + ";\n\n".join(IDE
 
 
 def viya_available() -> tuple[bool, str]:
-    """True when SWAT is installed and a CAS endpoint plus credentials are set."""
-    try:
-        import swat  # noqa: F401
-    except ImportError:
-        return False, "SWAT is not installed."
+    """True when a CAS endpoint and credentials are set and SWAT loads.
+
+    SWAT is only imported when a connection is configured, and any failure
+    while loading it (not just a missing package) falls back to the Python
+    reference engine instead of stopping the app.
+    """
     url = os.environ.get("CAS_URL", "")
     if not url:
         return False, "No CAS_URL set."
     if not (os.environ.get("VIYA_TOKEN") or (os.environ.get("CAS_USER") and os.environ.get("CAS_PW"))):
         return False, "No VIYA_TOKEN or CAS_USER/CAS_PW set."
+    try:
+        import swat  # noqa: F401
+    except Exception as err:   # e.g. SWAT not yet supporting this Python version
+        return False, f"SWAT could not load ({type(err).__name__})."
     return True, url
 
 

@@ -1,5 +1,7 @@
 streamlit>=1.50
 pandas>=2.0
 matplotlib>=3.7
-swat>=1.13
 requests>=2.31
+# SWAT is needed only to connect to SAS Viya. On Streamlit Cloud choose
+# Python 3.12 (Advanced settings) before adding it back:
+# swat>=1.13
